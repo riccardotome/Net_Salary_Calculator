@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gross-to-Net Salary Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F6F9;--card:#FFFFFF;--ink:#0F1B2D;--mute:#5B6678;--line:#E3E8EF;--acc:#1D4ED8;--accsoft:#E8EEFC;--net:#0F9D74;--c1:#1D4ED8;--c2:#6D8FE8;--c3:#B08A2E;--c4:#8A94A6;--c5:#C2543F;--field:#F8FAFC;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0B1220;--card:#121B2D;--ink:#E7ECF4;--mute:#97A3B6;--line:#243047;--acc:#6C97FF;--accsoft:#1A2848;--net:#2FC99B;--c1:#6C97FF;--c2:#4B67A8;--c3:#D1A94A;--c4:#7C879A;--c5:#E07A66;--field:#0E1626}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0B1220;--card:#121B2D;--ink:#E7ECF4;--mute:#97A3B6;--line:#243047;--acc:#6C97FF;--accsoft:#1A2848;--net:#2FC99B;--c1:#6C97FF;--c2:#4B67A8;--c3:#D1A94A;--c4:#7C879A;--c5:#E07A66;--field:#0E1626}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:linear-gradient(180deg,var(--accsoft) 0,transparent 280px) no-repeat,var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 18px 56px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.sub{color:var(--mute);margin-top:2px}
+.badge{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);background:var(--accsoft);padding:5px 10px;border-radius:20px}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--mute);font:500 13px Inter,sans-serif;padding:9px 14px;border-radius:8px;cursor:pointer;min-height:40px}
+nav button{transition:all .15s ease}nav button:hover{border-color:var(--acc);color:var(--ink)}nav button.on{background:var(--acc);color:var(--card);border-color:var(--acc);box-shadow:0 6px 14px -6px var(--acc)}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 1px 2px rgba(15,27,45,.04),0 10px 28px -14px rgba(15,27,45,.18)}
+.card h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:14px}
+.field{margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:500;color:var(--mute);margin-bottom:6px}
+input[type=number],select{width:100%;font:500 15px Inter,sans-serif;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:8px;padding:11px 12px;min-height:44px}
+input,select{transition:border-color .15s,box-shadow .15s}input:focus,select:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--accsoft)}
+.seg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:8px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--mute);font:500 13px Inter,sans-serif;padding:8px 6px;border-radius:6px;cursor:pointer;min-height:36px}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--field);cursor:pointer;margin-bottom:10px}
+.chk input{width:18px;height:18px;margin-top:2px;accent-color:var(--acc);flex:none}
+.chk b{display:block;font-weight:600;font-size:13px}.chk span{color:var(--mute);font-size:12px;display:block;margin-top:2px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(15,27,45,.04),0 10px 28px -14px rgba(15,27,45,.18)}
+.kpi small{display:block;color:var(--mute);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.kpi strong{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:4px}
+.kpi.main{border-left:3px solid var(--net)}.kpi.main strong{color:var(--net)}
+.bar{display:flex;height:28px;border-radius:9px;overflow:hidden;gap:3px;margin-bottom:14px}
+.bar i{display:block;min-width:3px;border-radius:4px;transition:flex-grow .5s ease}
+.leg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mute);margin-bottom:18px}
+.leg span:before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--c);margin-right:6px}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);text-align:right;padding:0 0 8px}
+th:first-child,td:first-child{text-align:left}
+td{padding:10px 0;border-top:1px solid var(--line);text-align:right}
+td:first-child{color:var(--mute)}
+tr.g td,tr.n td{font-weight:700;color:var(--ink)}tr.n td:nth-child(2){color:var(--net)}
+tr.h td{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding-top:18px;border-top:0}
+tr.m td{font-size:13px}#tbl tr:not(.h):hover td{background:var(--field)}td{transition:background .12s}
+.note{margin-top:16px;padding:12px 14px;background:var(--accsoft);border-radius:8px;color:var(--mute);font-size:12px;line-height:1.6}
+.fxbox{margin-top:6px;padding-top:16px;border-top:1px solid var(--line)}.foot{margin-top:18px;color:var(--mute);font-size:12px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){h1{font-size:20px}.kpi strong{font-size:18px}.card{padding:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div><h1>Gross-to-Net Salary Calculator</h1><div class="sub">Compare take-home pay across 10 countries, including expat and returnee tax regimes.</div></div><span class="badge">Indicative estimates</span></header>
+<nav id="nav"></nav>
+<div class="layout">
+  <section class="card"><h2>Inputs</h2><div id="form"></div><div id="fx"></div></section>
+  <section>
+    <div class="kpis" id="kpis"></div>
+    <div class="card"><h2>Where your gross salary goes</h2><div class="bar" id="bar"></div><div class="leg" id="leg"></div><table id="tbl"></table><div class="note" id="note"></div></div>
+  </section>
+</div>
+<p class="foot">Rules approximated on 2024–26 tax years. For a binding figure, consult a local tax adviser.</p>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const prog=(b,t)=>{let x=0,p=0;for(const[l,r]of t){if(b>p)x+=(Math.min(b,l)-p)*r;p=l}return x};
+const interp=(P,x)=>{if(x<=P[0][0])return P[0][1];for(let i=0;i<P.length-1;i++){const[a,b]=P[i],[c,d]=P[i+1];if(x<=c)return b+(x-a)/(c-a)*(d-b)}return P[P.length-1][1]};
+const REG={Abruzzo:1.73,Basilicata:1.23,Calabria:1.73,Campania:2.03,"Emilia-Romagna":1.33,"Friuli-Venezia Giulia":1.23,Lazio:1.73,Liguria:1.23,Lombardia:1.23,Marche:1.23,Molise:2.03,Piemonte:1.62,Puglia:1.33,Sardegna:1.23,Sicilia:1.23,Toscana:1.42,"Trentino-Alto Adige":1.23,Umbria:1.23,"Valle d’Aosta":1.23,Veneto:1.23};
+const CCAA={Madrid:.92,Cataluña:1.05,Andalucía:.97,"C. Valenciana":1.02,"Other / average":1};
+const CANT={Zug:.55,Zurich:1,Geneva:1.2,Vaud:1.25,Ticino:1.05,Bern:1.15,"Basel-Stadt":1.1};
+const CURVE=[[2e4,2],[4e4,6],[6e4,9],[8e4,12],[1e5,15],[15e4,19],[25e4,23],[4e5,26],[8e5,29],[15e5,31]];
+const AK=[[0,0],[11491,968],[24821,4605],[39957,5158],[75e3,3e3],[124934,0],[2e5,0]];
+const N=(id,label,def,step)=>({id,label,t:"n",def,step:step||500});
+const S=(id,label,opts,def)=>({id,label,t:"s",opts,def:def??opts[0]});
+const C=(id,label,sub)=>({id,label,sub,t:"c",def:false});
+const INF=Infinity;
+const COUNTRIES={
+IT:{flag:"🇮🇹",name:"Italy",cur:"EUR",f:[N("g","Gross annual salary (RAL)",45e3),S("months","Salary instalments",[12,13,14],13),S("region","Region",Object.keys(REG),"Lombardia"),N("kids","Dependent children over 21",0,1),C("imp","Impatriate regime (“rientro dei cervelli”)","50% of taxable income exempt, 60% with a minor child. Requires prior foreign residence."),C("minor","At least one minor child","Raises the exemption to 60%.")],
+ calc(v){const g=v.g,inps=g*.0919,ti=g-inps,r=v.imp?(v.minor?.6:.5):0,b=ti*(1-r);const dl=b<=15e3?1955:b<=28e3?1910+1190*(28e3-b)/13e3:b<=5e4?1910*(5e4-b)/22e3:0,dk=v.kids*950;const tax=Math.max(0,prog(b,[[28e3,.23],[5e4,.35],[INF,.43]])-dl-dk),add=b*(REG[v.region]/100+.006);
+ return{ded:[["Social security (INPS, 9.19%)",inps],["Income tax (IRPEF)",tax],["Regional & municipal surcharges",add]],memo:[["Taxable income",ti],...(r?[["Impatriate exemption ("+r*100+"%)",-ti*r]]:[]),["Tax credits applied",dl+dk]],note:"IRPEF 2024 brackets (23/35/43%), standard employee INPS rate and employment tax credits. Municipal surcharge assumed at 0.6%. Children under 21 are covered by the separate Assegno Unico benefit, not included here. Impatriate regime eligibility conditions (prior residence, minimum stay, €600k cap) are not verified."}}},
+ES:{flag:"🇪🇸",name:"Spain",cur:"EUR",f:[N("g","Gross annual salary",45e3),S("months","Pay instalments",[12,14],14),S("regime","Tax regime",["General","Beckham Law"]),S("ccaa","Autonomous community",Object.keys(CCAA),"Cataluña"),N("kids","Children",0,1)],
+ calc(v){const g=v.g,ss=Math.min(g,56646)*.0647,base=g-ss;let tax,min=0;if(v.regime=="Beckham Law")tax=prog(g,[[6e5,.24],[INF,.47]]);else{for(let i=0;i<v.kids;i++)min+=[2400,2700,4e3,4500][Math.min(i,3)];tax=prog(Math.max(0,base-min),[[12450,.19],[20200,.24],[35200,.3],[6e4,.37],[3e5,.45],[INF,.47]])*CCAA[v.ccaa]}
+ return{ded:[["Social security (6.47%)",ss],["Personal income tax (IRPF)",tax]],memo:[["Taxable base",base],...(min?[["Family minimum applied",-min]]:[])],note:v.regime=="Beckham Law"?"Beckham Law (impatriate regime): flat 24% up to €600k, 47% above, regardless of region. Social security still applies.":"Combined state and regional scale approximated, with an indicative adjustment factor for the selected community. Exact brackets vary slightly by region."}}},
+CH:{flag:"🇨🇭",name:"Switzerland",cur:"CHF",f:[N("g","Gross annual salary",9e4,1e3),S("canton","Canton",Object.keys(CANT),"Zurich"),N("kids","Dependent children",0,1),C("exp","Qualified expatriate deductions","Flat CHF 20,000 deduction for housing and schooling, up to 5 years.")],
+ calc(v){const g=v.g,soc=g*.053+Math.min(g,148200)*.011+g*.01+Math.max(0,g-25725)*.07,ti=Math.max(0,g-soc-v.kids*9e3-(v.exp?2e4:0)),tax=ti*interp(CURVE,ti)/100*CANT[v.canton];
+ return{ded:[["AHV/IV/EO, ALV, NBU, pension (LPP)",soc],["Federal, cantonal & communal tax",tax]],memo:[["Taxable income",ti]],note:"Very approximate: tax varies widely by municipality, not only by canton. Pension fund (LPP) contributions assumed at 7% (7–18% by age). Single filer, no church tax."}}},
+NL:{flag:"🇳🇱",name:"Netherlands",cur:"EUR",f:[N("g","Gross annual salary",55e3),C("rul","30% ruling (expat)","Simplified as a constant 30% exemption. Since 2024 it phases down 30/20/10% over 5 years.")],
+ calc(v){const g=v.g,tb=v.rul?g*.7:g,gross=prog(tb,[[75518,.3697],[INF,.495]]),cr=(tb<=24812?3362:Math.max(0,3362-.0663*(tb-24812)))+interp(AK,tb);
+ return{ded:[["Box 1 income tax, after credits",Math.max(0,gross-cr)]],memo:[...(v.rul?[["30% ruling exemption",-g*.3]]:[]),["Tax credits (heffingskortingen)",cr]],note:"Box 1 rates already include social premiums for most workers below pension age. Tax credits use simplified curves."}}},
+UK:{flag:"🇬🇧",name:"United Kingdom",cur:"GBP",f:[N("g","Gross annual salary",5e4)],
+ calc(v){const g=v.g,pa=g>1e5?Math.max(0,12570-(g-1e5)/2):12570,tax=prog(Math.max(0,g-pa),[[37700,.2],[74870,.4],[INF,.45]]),ni=Math.max(0,Math.min(g,50270)-12570)*.08+Math.max(0,g-50270)*.02;
+ return{ded:[["Income tax",tax],["National Insurance",ni]],memo:[["Personal allowance",pa]],note:"2024/25 rates. The former non-dom regime was replaced in April 2025 by a 4-year FIG regime for new residents, which does not change tax on UK employment income. Excludes pension contributions, student loans and Scottish rates."}}},
+IE:{flag:"🇮🇪",name:"Ireland",cur:"EUR",f:[N("g","Gross annual salary",55e3),C("sarp","SARP relief","30% of income between €100k and €1m exempt from income tax only, up to 5 years.")],
+ calc(v){const g=v.g,rel=v.sarp?Math.max(0,Math.min(g,1e6)-1e5)*.3:0,tax=prog(g-rel,[[42e3,.2],[INF,.4]]),usc=g>13e3?prog(g,[[12012,.005],[25760,.02],[70044,.04],[INF,.08]]):0;
+ return{ded:[["Income tax",tax],["Universal Social Charge",usc],["PRSI (4.1%)",g>18304?g*.041:0]],memo:rel?[["SARP relief",-rel]]:[],note:"Single person, standard rate band €42,000. SARP applies to income tax only, not USC or PRSI. Married couples have different bands."}}},
+DE:{flag:"🇩🇪",name:"Germany",cur:"EUR",f:[N("g","Gross annual salary",55e3),N("kids","Children",0,1),C("ch","Church tax (~9%)","")],
+ calc(v){const g=v.g,k=Math.min(g,62100),r=Math.min(g,90600),soc=k*(.0815+.017+(v.kids?0:.006))+r*.106,z=Math.max(0,g-soc-1266),t=z<=11604?0:z<=17005?((922.98*(z-11604)/1e4+1400)*(z-11604)/1e4):z<=66760?((181.19*(z-17005)/1e4+2397)*(z-17005)/1e4+1025.38):z<=277825?.42*z-10602.13:.45*z-18936.88;
+ return{ded:[["Social contributions (health, care, pension, unemployment)",soc],["Income tax",t],["Solidarity surcharge",t>18130?t*.055:0],...(v.ch?[["Church tax",t*.09]]:[])],memo:[["Taxable income (approx.)",z]],note:"Tax class I (single), 2024 tariff. Taxable income approximated net of social contributions. Germany has no general impatriate regime comparable to Italy, Spain, the Netherlands or Ireland."}}},
+FR:{flag:"🇫🇷",name:"France",cur:"EUR",f:[N("g","Gross annual salary",5e4),S("st","Household",["Single","Couple"]),N("kids","Dependent children",0,1),C("imp","Impatriate regime (Art. 155 B)","30% of pay exempt from income tax for up to 8 years. Social contributions still apply.")],
+ calc(v){const g=v.g,cot=g*.22,nat=g-cot,ex=v.imp?nat*.3:0,b=nat-ex,ab=Math.min(b*.1,14171),ri=b-ab,p=(v.st=="Couple"?2:1)+Math.min(v.kids,2)*.5+Math.max(0,v.kids-2),tax=prog(ri/p,[[11294,0],[28797,.11],[82341,.3],[177106,.41],[INF,.45]])*p;
+ return{ded:[["Employee social contributions (~22%)",cot],["Income tax (family quotient)",tax]],memo:[["Net before tax",nat],...(ex?[["Impatriate exemption (30%)",-ex]]:[]),["Taxable income ("+p+" parts)",ri]],note:"Employee contributions estimated at 22% (about 20–23% depending on status). Family quotient cap not modelled."}}},
+AU:{flag:"🇦🇺",name:"Australia",cur:"AUD",f:[N("g","Gross annual salary, excl. super",9e4,1e3),C("whm","Working holiday maker rates","15% up to A$45k, then 32.5% up to A$135k. No Medicare levy.")],
+ calc(v){const g=v.g,w=v.whm,tax=prog(g,w?[[45e3,.15],[135e3,.325],[19e4,.37],[INF,.45]]:[[18200,0],[45e3,.15],[135e3,.3],[19e4,.37],[INF,.45]]);return{ded:[["Income tax",tax],...(w?[]:[["Medicare levy (2%)",g>26e3?g*.02:0]])],memo:[["Employer superannuation, paid on top (12%)",g*.12]],note:"Resident rates for 2026–27 (Stage 3 schedule: 15% on A$18,201–45,000, 30% to A$135,000, 37% to A$190,000, 45% above). Medicare levy low-income reductions and HELP repayments are not modelled. Employer superannuation is paid on top of your salary and is not part of take-home pay."}}},
+AE:{flag:"🇦🇪",name:"UAE",cur:"AED",f:[N("g","Gross annual salary",2e5,1e3)],
+ calc(){return{ded:[],memo:[],note:"No personal income tax. Foreign employees do not pay local social security (mandatory only for UAE/GCC nationals)."}}}};
+let cc="IT",fx=false;const st={};const RATE={CHF:.926,GBP:.852,AUD:1.643,AED:4.19};
+for(const k in COUNTRIES){st[k]={};COUNTRIES[k].f.forEach(f=>st[k][f.id]=f.def);}
+const COL=["var(--c1)","var(--c2)","var(--c3)","var(--c4)","var(--c5)"];
+$("#nav").innerHTML=Object.keys(COUNTRIES).map(k=>`<button data-k="${k}">${COUNTRIES[k].flag} ${COUNTRIES[k].name}</button>`).join("");
+$("#nav").onclick=e=>{const k=e.target.closest("button")?.dataset.k;if(k){cc=k;buildForm();render()}};
+function buildForm(){const c=COUNTRIES[cc];$("#form").innerHTML=c.f.map(f=>{const v=st[cc][f.id];
+ if(f.t=="n")return`<div class="field"><label>${f.label} (${c.cur})</label><input type="number" data-id="${f.id}" value="${v}" min="0" step="${f.step}" inputmode="decimal"></div>`.replace(` (${c.cur})`,f.id=="g"?` (${c.cur})`:"");
+ if(f.t=="s")return f.opts.length<=3?`<div class="field"><label>${f.label}</label><div class="seg" data-id="${f.id}">${f.opts.map(o=>`<button type="button" data-v="${o}" class="${o==v?"on":""}">${o}</button>`).join("")}</div></div>`:`<div class="field"><label>${f.label}</label><select data-id="${f.id}">${f.opts.map(o=>`<option ${o==v?"selected":""}>${o}</option>`).join("")}</select></div>`;
+ return`<label class="chk"><input type="checkbox" data-id="${f.id}" ${v?"checked":""}><div><b>${f.label}</b>${f.sub?`<span>${f.sub}</span>`:""}</div></label>`}).join("");
+ document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.k==cc));buildFx();}
+function buildFx(){const c=COUNTRIES[cc],el=$("#fx");if(c.cur=="EUR"){el.innerHTML="";return}el.innerHTML=`<div class="fxbox"><label class="chk"><input type="checkbox" id="fxon" ${fx?"checked":""}><div><b>Show amounts in EUR</b><span>Converts results from ${c.cur} at the rate below.</span></div></label><div class="field"><label>Exchange rate (EUR 1 = ${c.cur})</label><input type="number" id="fxrate" value="${RATE[c.cur]}" min="0" step="0.001" inputmode="decimal"></div></div>`}
+$("#fx").addEventListener("input",e=>{const cur=COUNTRIES[cc].cur;if(e.target.id=="fxon")fx=e.target.checked;if(e.target.id=="fxrate")RATE[cur]=Math.max(.0001,parseFloat(e.target.value)||RATE[cur]);render()});
+$("#form").addEventListener("input",e=>{const f=COUNTRIES[cc].f.find(x=>x.id==e.target.dataset.id);if(!f)return;st[cc][f.id]=f.t=="n"?Math.max(0,parseFloat(e.target.value)||0):f.t=="c"?e.target.checked:(isNaN(e.target.value)?e.target.value:+e.target.value);render()});
+$("#form").addEventListener("click",e=>{const b=e.target.closest(".seg button");if(!b)return;const id=b.parentNode.dataset.id,f=COUNTRIES[cc].f.find(x=>x.id==id);st[cc][id]=isNaN(b.dataset.v)?b.dataset.v:+b.dataset.v;b.parentNode.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x==b));render()});
+function render(){const c=COUNTRIES[cc],v=st[cc],r=c.calc(v),g=v.g,tot=r.ded.reduce((a,d)=>a+d[1],0),net=g-tot,m=v.months||12;
+ const conv=fx&&c.cur!="EUR",cu=conv?"EUR":c.cur,k=conv?1/RATE[c.cur]:1,F=n=>new Intl.NumberFormat("en-GB",{style:"currency",currency:cu,maximumFractionDigits:0}).format(n*k),P=n=>g?(n/g*100).toFixed(1)+"%":"–";
+ $("#kpis").innerHTML=`<div class="kpi main"><small>Net annual</small><strong>${F(net)}</strong></div><div class="kpi"><small>Net monthly (${m})</small><strong>${F(net/m)}</strong></div><div class="kpi"><small>Total deductions</small><strong>${F(tot)}</strong></div><div class="kpi"><small>Effective rate</small><strong>${P(tot)}</strong></div>`;
+ $("#bar").innerHTML=r.ded.map((d,i)=>`<i style="flex-grow:${d[1]};background:${COL[i%5]}"></i>`).join("")+`<i style="flex-grow:${net};background:var(--net)"></i>`;
+ $("#leg").innerHTML=r.ded.map((d,i)=>`<span style="--c:${COL[i%5]}">${d[0]}</span>`).join("")+`<span style="--c:var(--net)">Net pay</span>`;
+ $("#tbl").innerHTML=`<tr><th></th><th>Annual</th><th>% of gross</th></tr><tr class="g"><td>Gross salary</td><td>${F(g)}</td><td>100%</td></tr>`+r.ded.map(d=>`<tr><td>− ${d[0]}</td><td>${F(d[1])}</td><td>${P(d[1])}</td></tr>`).join("")+`<tr class="n"><td>Net pay</td><td>${F(net)}</td><td>${P(net)}</td></tr>`+(r.memo.length?`<tr class="h"><td colspan="3">Tax base & reliefs</td></tr>`+r.memo.map(d=>`<tr class="m"><td>${d[0]}</td><td>${d[1]<0?"− "+F(-d[1]):F(d[1])}</td><td></td></tr>`).join(""):"");
+ $("#note").textContent=r.note+(conv?" Amounts shown in EUR at 1 EUR = "+RATE[c.cur]+" "+c.cur+". Default rates are ECB reference rates from mid-July 2026 (AED derived from the USD peg); edit the rate for a current figure.":"")}
+buildForm();render();
+</script>
+</body>
+</html>
